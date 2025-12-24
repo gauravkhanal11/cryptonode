@@ -1,0 +1,228 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto Tracker - Pro Dashboard</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+    <style>
+        /* Custom Scrollbar for Dark Theme consistency in the News section */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #181A21; }
+        ::-webkit-scrollbar-thumb { background: #3C4658; border-radius: 10px; }
+        
+        /* Subtle border for table rows to maintain a grid feel without heavy lines */
+        .table-row-border { border-bottom: 1px solid #3C4658; }
+
+        /* Fixed height for News Board to match the Market Cap card on the left */
+        .news-scroll-container {
+            height: 400px; 
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen" style="background-color: #181A21;">
+    
+    <header style="background-color: #232B38;" class="fixed top-0 w-full h-24 border-b border-gray-800 z-50">
+        <div class="container mx-auto h-full px-6 flex items-center justify-between">
+             <div class="flex items-center">
+                <img src="{% static 'dashboard/logo.png' %}" alt="CRYPTOnode Logo" class="h-16 w-auto">
+             </div>
+
+             <a href="https://www.gauravkhanal.com/" target="_blank" 
+                class="px-8 py-3 rounded-lg text-white font-bold hover:opacity-90 transition-opacity" 
+                style="background-color: #54B51F;">
+                Reach out
+             </a>
+        </div>
+    </header>
+
+    <main class="container mx-auto flex-1 px-6 pt-32 pb-12">
+        
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 mb-12 items-start">
+            
+            <div class="lg:col-span-5 h-full">
+                <h2 class="text-xl font-bold mb-4 uppercase tracking-tight" style="color: #E7C100;">TODAY'S MARKET CAP</h2>
+                <div id="market-card" class="rounded-xl p-6 space-y-6 shadow-2xl h-[400px] flex flex-col justify-between" style="background-color: #232B38;">
+                    
+                    <div class="space-y-4">
+                        <div class="text-base text-gray-300">
+                            <span class="font-bold">Today's Market Cap (USD):</span> 
+                            <span class="text-white">{{ market.today_market_cap }}</span>
+                        </div>
+                        <div class="text-base text-gray-300">
+                            <span class="font-bold">Movement in 24 hrs:</span> 
+                            <span class="text-white">{{ market.today_movement }}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="w-full rounded-lg p-6 relative" style="background-color: #3C4658;">
+                        <div class="absolute top-4 right-4 flex items-center gap-4">
+                            <div class="flex items-center gap-1.5">
+                                <div class="w-3 h-3 rounded-sm" style="background-color: #54B51F;"></div>
+                                <span class="text-[10px] text-gray-200 uppercase font-bold">Today</span>
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <div class="w-3 h-3 rounded-sm" style="background-color: #E7C100;"></div>
+                                <span class="text-[10px] text-gray-200 uppercase font-bold">All time high</span>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-4 pt-6">
+                            <div class="h-12 rounded-sm" style="background-color: #54B51F; width: {{ market.today_market_cap_percent }}%;"></div>
+                            <div class="h-12 rounded-sm" style="background-color: #E7C100; width: 100%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="text-sm text-gray-400">
+                        <span class="font-bold">All time high on:</span> {{ market.ath_market_cap_date }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="lg:col-span-7 h-full">
+                <h2 class="text-xl font-bold mb-4 uppercase tracking-tight" style="color: #E7C100;">NEWS</h2>
+                <div class="rounded-xl shadow-2xl overflow-hidden" style="background-color: #232B38;">
+                    <div class="news-scroll-container px-4">
+                        
+                        {% for article in news_board %}
+                        <a href="{{ article.url }}" target="_blank" class="block group border-b border-gray-700 last:border-0 py-2.5 hover:bg-[#2d3748] transition-all rounded-lg px-2">
+                            <div class="flex gap-4 items-start">
+                                <div class="w-[72px] h-[72px] shrink-0 rounded overflow-hidden bg-[#181A21]">
+                                    <img src="{{ article.thumbnail_link }}" alt="News Thumbnail" class="w-full h-full object-cover">
+                                </div>
+                                <div class="flex flex-col">
+                                    <h3 class="text-white font-bold text-sm group-hover:text-[#E7C100] transition-colors line-clamp-2 leading-tight mb-1">
+                                        {{ article.title }}
+                                    </h3>
+                                    <p class="text-gray-400 text-[11px] line-clamp-3 leading-tight">
+                                        {{ article.description }}
+                                    </p>
+                                </div>
+                            </div>
+                        </a>
+                        {% endfor %}
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="w-full">
+            <div class="flex items-center justify-between mb-4">
+                <p class="text-sm font-medium" style="color: #E7C100;">Last updated: {{ market.last_updated }}</p>
+            </div>
+            
+            <div class="rounded-xl overflow-hidden shadow-2xl" style="background-color: #232B38;">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="text-[#E7C100] text-sm uppercase tracking-wider table-row-border">
+                            <th class="px-6 py-4 font-bold">Today's trend</th>
+                            <th class="px-6 py-4 font-bold">Coin</th>
+                            <th class="px-6 py-4 font-bold text-center">Rank</th>
+                            <th class="px-6 py-4 font-bold">Price (USD)</th>
+                            <th class="px-6 py-4 font-bold text-center">Market Share</th>
+                            <th class="px-6 py-4 font-bold">Last 15 mins</th>
+                            <th class="px-6 py-4 font-bold">Last 24 hours</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-gray-300">
+                        {% for coin in coins %}
+                        <tr class="table-row-border hover:bg-[#2d3748] transition-colors">
+                            <td class="px-6 py-4 w-40">
+                                <div class="h-12 w-28 bg-[#181A21] rounded p-1">
+                                    <canvas id="chart-{{ forloop.counter }}"></canvas>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="flex items-center gap-2">
+                                    <span class="font-bold text-white text-lg">{{ coin.name }}</span>
+                                    <span class="rounded px-2 py-0.5 text-xs font-bold border" style="border-color: #E7C100; color: #E7C100;">{{ coin.symbol }}</span>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 text-center">{{ coin.rank }}</td>
+                            <td class="px-6 py-4 font-medium text-white">{{ coin.trading_price|floatformat:2 }}</td>
+                            <td class="px-6 py-4 text-center">{{ coin.market_cap_percent }}%</td>
+                            <td class="px-6 py-4 font-bold">
+                                <span class="flex items-center gap-1 {% if coin.charts.fifteen_min < 0 %}text-red-500{% else %}text-[#54B51F]{% endif %}">
+                                    {{ coin.charts.fifteen_min }}%
+                                    <i data-lucide="trending-{% if coin.charts.fifteen_min < 0 %}down{% else %}up{% endif %}" class="w-4 h-4"></i>
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 font-bold">
+                                <span class="flex items-center gap-1 {% if coin.charts.twentyfour_hour < 0 %}text-red-500{% else %}text-[#54B51F]{% endif %}">
+                                    {{ coin.charts.twentyfour_hour }}%
+                                    <i data-lucide="trending-{% if coin.charts.twentyfour_hour < 0 %}down{% else %}up{% endif %}" class="w-4 h-4"></i>
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <footer style="background-color: #232B38;" class="w-full h-24 mt-8 border-t border-gray-800 flex items-center justify-center">
+        <p class="text-gray-500 text-sm">© 2025 Crypto Tracker Dashboard</p>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+
+        const coinChartData = [
+            {% for coin in coins %}
+            {
+                canvasId: 'chart-{{ forloop.counter }}',
+                data: [
+                    {{ coin.charts.twentyfour_hour }},
+                    {{ coin.charts.twelve_hour }},
+                    {{ coin.charts.six_hour }},
+                    {{ coin.charts.one_hour }},
+                    {{ coin.charts.thirty_min }},
+                    {{ coin.charts.fifteen_min }}
+                ],
+                isPositive: {{ coin.charts.fifteen_min }} >= 0
+            }{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ];
+
+        coinChartData.forEach(coinData => {
+            const ctx = document.getElementById(coinData.canvasId);
+            if (ctx) {
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: ['', '', '', '', '', ''],
+                        datasets: [{
+                            data: coinData.data,
+                            borderColor: coinData.isPositive ? '#54B51F' : '#ef4444',
+                            backgroundColor: 'transparent',
+                            borderWidth: 2,
+                            tension: 0.4,
+                            pointRadius: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { 
+                            legend: { display: false },
+                            tooltip: { enabled: false }
+                        },
+                        scales: { 
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
