@@ -33,7 +33,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 mb-10">
             <div class="lg:col-span-4">
                 <div id="market-card" class="rounded-xl shadow-2xl h-[190px] flex flex-col p-4 relative overflow-hidden" style="background-color: #232B38;">
-                    <h2 class="text-xs font-bold mb-2 uppercase tracking-tight text-center" style="color: #E7C100;">CRYPTO MARKET VALUE</h2>
+                    <h2 class="text-xs font-bold mb-2 uppercase tracking-tight text-center" style="color: #E7C100;">CRYPTO COINS MARKET VALUE</h2>
                     
                     <div class="w-full flex-1 px-0 overflow-hidden">
                         <canvas id="marketBarChart"></canvas>
@@ -176,7 +176,7 @@
         const marketChart = new Chart(barCtx, {
             type: 'bar',
             data: {
-                labels: ['Today', 'ATH'],
+                labels: ['Today', 'ATH '],
                 datasets: [{
                     data: [{{ market.today_market_cap_percent }}, 100],
                     backgroundColor: ['#54B51F', '#E7C100'],
