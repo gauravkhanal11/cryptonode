@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.http import JsonResponse
+from django.conf import settings
 import requests
 from .utilities import num_to_word
 import os
@@ -108,11 +109,11 @@ def dashboard(request):
 
 #================================================== NEWS BOARD =================================================
     try:
-        news_api_key = "DAFF19F7BF06ED8BB5EA361A3EE4A4E0"
-        news_api_endpoint = f"https://api.thenewsapi.net/crypto?apikey={news_api_key}"
+        news_api_endpoint = f"https://api.thenewsapi.net/crypto?apikey={settings.NEWS_API_KEY}"
         news_response = requests.get(url=news_api_endpoint)
     except:
-        news_response = {}
+        news_response={}
+
 
     news_json = news_response.json()
     articles = news_json.get("data",{}).get("results",{})
